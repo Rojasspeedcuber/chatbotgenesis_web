@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  PENDING
+  AUTHORIZED
+  ACTIVE
+  PAUSED
+  CANCELLED
+  PAST_DUE
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String?
+  role          UserRole  @default(USER)
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  lastActiveAt  DateTime  @default(now())
+
+  subscription  Subscription?
+  payments      Payment[]
+  chatSessions  ChatSession[]
+
+  @@index([email])
+}
+
+model Subscription {
+  id              String             @id @default(cuid())
+  userId          String             @unique
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status          SubscriptionStatus @default(PENDING)
+  mpPreapprovalId String?            @unique
+  planId          String?
+  externalReference String?
+  startedAt       DateTime?
+  updatedAt       DateTime           @updatedAt
+  canceledAt      DateTime?
+  nextPaymentDate DateTime?
+
+  @@index([mpPreapprovalId])
+  @@index([status])
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mpPaymentId String   @unique
+  status      String
+  amount      Decimal  @db.Decimal(10, 2)
+  paidAt      DateTime?
+  rawPayload  Json?
+  createdAt   DateTime @default(now())
+
+  @@index([mpPaymentId])
+  @@index([userId])
+}
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+
+  @@index([userId])
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String      // 'user' | 'assistant'
+  content   String
+  createdAt DateTime    @default(now())
+
+  @@index([sessionId])
+}
+
+model BibleVerse {
+  id          String  @id @default(cuid())
+  book        String
+  chapter     Int
+  verse       Int
+  text        String
+  translation String  @default("NVI")
+
+  @@unique([book, chapter, verse, translation])
+  @@index([book, chapter])
+}
+
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  provider    String   // 'mercadopago'
+  eventType   String
+  externalId  String
+  receivedAt  DateTime @default(now())
+  processedAt DateTime?
+  status      String   // 'pending' | 'processed' | 'failed'
+  payloadJson Json
+  errorMessage String?
+
+  @@unique([provider, externalId, eventType])
+  @@index([provider, status])
+}
