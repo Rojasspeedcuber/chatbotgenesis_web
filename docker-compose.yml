@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     ports:
-      - "3000:3000"
+      - "6789:6789"
     environment:
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-postgres}@db:5432/chatbotgenesis
       - NEXTAUTH_URL=${APP_URL:-http://localhost:3000}
