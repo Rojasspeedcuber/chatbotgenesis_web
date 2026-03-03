@@ -43,9 +43,9 @@ COPY --from=builder /app/node_modules/dotenv ./node_modules/dotenv
 
 USER nextjs
 
-EXPOSE 3000
+EXPOSE 7000
 
-ENV PORT=3000
+ENV PORT=7000
 ENV HOSTNAME="0.0.0.0"
 
 # Start script: check DATABASE_URL, run migrations, start server
