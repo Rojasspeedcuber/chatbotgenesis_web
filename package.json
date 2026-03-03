@@ -19,6 +19,7 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.4.2",
     "@radix-ui/react-avatar": "^1.1.11",
