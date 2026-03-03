@@ -5,6 +5,8 @@ import { checkSubscriptionAccess } from "@/lib/subscription";
 import { generateBiblicalResponse } from "@/lib/chat-ai";
 import { chatMessageSchema } from "@/lib/validations";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();

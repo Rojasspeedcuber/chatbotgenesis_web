@@ -3,6 +3,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createSubscription } from "@/lib/mercadopago";
 
+export const dynamic = "force-dynamic";
+
 export async function POST() {
   try {
     const session = await auth();
