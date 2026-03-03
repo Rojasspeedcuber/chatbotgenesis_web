@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const validationResult = chatMessageSchema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: validationResult.error.errors[0].message },
+        { error: validationResult.error.issues?.[0]?.message ?? "Dados inválidos." },
         { status: 400 }
       );
     }
